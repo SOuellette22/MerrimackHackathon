@@ -1,0 +1,21 @@
+public class Map{
+    private HashMap<Integer, Location> locations;
+    private LinkedList<Truck> trucks;
+    public Map(LinkedList<Truck> trucks, HashMap<Integer, Location> locations){
+        this.trucks = trucks;
+        this.locations = locations;
+    }
+
+    /**
+     * builds the map object from the given locations and roads
+     */
+    public void buildMap(){
+
+    }
+    /**
+     * draws the map object visually
+     */
+    public void drawMap(){
+
+    }
+}
