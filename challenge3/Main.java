@@ -1,33 +1,37 @@
 import helperobjects.Location;
+import helperobjects.Truck;
 import helperobjects.Turtle;
 import merrimackutil.json.InvalidJSONException;
 import merrimackutil.json.JsonIO;
 import merrimackutil.json.types.JSONArray;
 import merrimackutil.json.types.JSONObject;
 import merrimackutil.json.types.JSONType;
-import merrimackutil.util.Tuple;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InvalidObjectException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class Main {
 
     private static HashMap<Integer, Location> locations;
+    private static Map<Integer, Map<Integer, Double>> roads;
+    private static LinkedList<Truck> trucks;
 
     public static void main(String[] args) throws InvalidJSONException, FileNotFoundException, InvalidObjectException {
         locations = new HashMap<>();
-        Tuple<JSONArray, JSONArray> arrays = deserialize(JsonIO.readObject(new File("challenge3/truck_routedataset.json")));
 
-        locations = processLocations(arrays.getFirst());
-        processRoads(arrays.getSecond());
+        deserialize(JsonIO.readObject(new File("challenge3/truck_routedataset.json")));
 
         System.out.println("Done!");
         System.out.println("Locations processed: " + locations.size());
+        System.out.println("Roads processed: width: " + roads.size() + " height:" + roads.get(0).size());
+
     }
 
-    public static Tuple<JSONArray, JSONArray> deserialize(JSONType type) throws InvalidObjectException {
+    public static void deserialize(JSONType type) throws InvalidObjectException {
         if (!(type instanceof JSONObject)) {
             throw new IllegalArgumentException("Expected a JSONObject");
         }
@@ -37,14 +41,30 @@ public class Main {
         String[] keys = {"meta", "locations", "roads", "blocked"};
         object.checkValidity(keys);
 
-        JSONArray locations = object.getArray("locations");
-        JSONArray roads = object.getArray("roads");
 
-        return  new Tuple<>(locations, roads);
+        processLocations(object.getArray("locations"));
+        processRoads(object.getArray("roads"));
+        processMeta(object.getObject("meta"));
     }
 
-    public static HashMap<Integer, Location> processLocations(JSONArray l) throws InvalidObjectException {
-        HashMap<Integer, Location> locations = new HashMap<>();
+    public static void processMeta(JSONObject object) throws InvalidObjectException {
+        String[] metaKeys = {"trucks", "truck_capacity"};
+        object.checkValidity(metaKeys);
+
+        int numTrucks = object.getInt("trucks");
+        int truckCapacity = object.getInt("truck_capacity");
+
+        trucks = new LinkedList<>();
+        Location depot = locations.get(0);
+
+        for (int i = 0; i < numTrucks; i++) {
+            trucks.add(new Truck(i, truckCapacity, depot));
+        }
+
+    }
+
+    public static void processLocations(JSONArray l) throws InvalidObjectException {
+        HashMap<Integer, Location> locationsMap = new HashMap<>();
         for (int i = 0; i < l.size(); i++) {
             JSONObject location = (JSONObject) l.get(i);
 
@@ -53,20 +73,21 @@ public class Main {
 
             int id = location.getInt("id");
             String name = location.getString("name");
-            double longitude = location.getDouble("longitude");
-            double latitude = location.getDouble("latitude");
+            double longitude = location.getDouble("longitude") * 10;
+            double latitude = location.getDouble("latitude") * 10;
             int demand = location.getInt("demand");
 
             if (name.equals("Depot")) {
-                locations.put(id, new Location(longitude, latitude));
+                locationsMap.put(id, new Location(longitude, latitude));
             } else {
-                locations.put(id, new Location(longitude, latitude, demand));
+                locationsMap.put(id, new Location(longitude, latitude, demand));
             }
         }
-        return locations;
+        locations = locationsMap;
     }
 
     public static void processRoads(JSONArray r) throws InvalidObjectException {
+        roads = new HashMap<>();
         for (int i = 0; i < r.size(); i++) {
             JSONObject road = r.getObject(i);
 
@@ -77,15 +98,13 @@ public class Main {
             int toId = road.getInt("to_id");
             int timeTraveled = road.getInt("travel_time_minutes");
 
-            Location fromLocation = locations.get(fromId);
-            Location toLocation = locations.get(toId);
-
-            if (fromLocation == null || toLocation == null) {
-                throw new InvalidObjectException("Invalid location ID in roads");
+            if (!roads.containsKey(fromId)) {
+                roads.put(fromId, new HashMap<>());
+                roads.get(fromId).put(toId, (double) timeTraveled);
+                System.out.println("Added road from " + fromId + " to " + toId + " with time " + timeTraveled);
+            } else {
+                roads.get(fromId).put(toId, (double) timeTraveled);
             }
-
-            // Assuming undirected roads
-            fromLocation.addRoad(toLocation, timeTraveled);
         }
     }
 }
