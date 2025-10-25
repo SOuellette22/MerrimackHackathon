@@ -9,8 +9,6 @@ import java.util.HashMap;
  */
 public class Location {
     Tuple<Double, Double> location;
-    // private double x;
-    // private double y;
     private int demand;
     private boolean visited;
     private boolean isDepot;
