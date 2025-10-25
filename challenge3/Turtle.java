@@ -1,17 +1,4 @@
-package helperobjects; /**AUTHOR: NICHOLAS SEWARD
- * EMAIL: nicholas.seward@gmail.com
- * LICENSE: MIT (USE THIS HOWEVER YOU SEE FIT.)
- * DATE: 6/21/2012
- * VERSION: 2 (THIS SHOULD BE VERSION 0.1 BUT THAT IS A SILLY NUMBERING SYSTEM.)
- *
- *
- * THIS SOFTWARE HAS NO WARRANTY.  IF IT WORKS, SUPER.  IF IT DOESN'T, LET ME
- * KNOW AND I MIGHT OR MIGHT NOT DO SOMETHING ABOUT IT.
- *
- *    .-./*)   .-./*)   .-./*)   .-./*)   .-./*)   .-./*)   .-./*)   .-./*)
- *  _/___\/  _/___\/  _/___\/  _/___\/  _/___\/  _/___\/  _/___\/  _/___\/
- *    U U      U U      U U      U U      U U      U U      U U      U U
- */
+
 
 import java.awt.event.*;
 import javax.swing.*;
