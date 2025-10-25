@@ -28,32 +28,15 @@ public class Truck {
     }
 
     /**
-     * checks if a location has been visited by this truck
-     * @param loc
-     * @return
-     */
-    public boolean checkVisit(Location loc) {
-        return this.visitedLocations.contains(loc);
-        // if (loc.getDemand() <= load) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
-    }
-
-    /**
      * visits a location and subtracts it's demand from this truck's capacity
      * @param loc
      */
     public void visit(Location nextLoc) {
-        if (checkVisit(nextLoc)) {
-            load -= nextLoc.getDemand();
-            this.visitedLocations.add(nextLoc);
-            nextLoc.setVisited();
-            this.minutesTravelled += this.currentLocation.getMinutes(nextLoc);
-        } else {
-            System.out.println("Not enough load to visit this location.");
-        }
+        load -= nextLoc.getDemand();
+        this.visitedLocations.add(nextLoc);
+        nextLoc.visit();
+        this.minutesTravelled += this.currentLocation.getMinutes(nextLoc);
+        this.currentLocation = nextLoc;
     }
 
     /**

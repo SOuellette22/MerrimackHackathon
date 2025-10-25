@@ -40,6 +40,10 @@ public class Location {
         this.isDepot = true; // if the location doesn't have a demand, its automatically a depot
     }
 
+    public int getId() {
+        return id;
+    }
+
     /**
      * returns a tuple containing the coordinates of 
      * @return
@@ -67,7 +71,7 @@ public class Location {
     /**
      * sets the isVisited variable to true (wont need to be reversed)
      */
-    public void setVisited() {
+    public void visit() {
         this.visited = true;
     }
 
