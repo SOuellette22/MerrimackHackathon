@@ -1,6 +1,4 @@
-import helperobjects.Location;
-import helperobjects.Truck;
-import helperobjects.Turtle;
+import helperobjects.*;
 import merrimackutil.json.InvalidJSONException;
 import merrimackutil.json.JsonIO;
 import merrimackutil.json.types.JSONArray;
@@ -28,6 +26,15 @@ public class Main {
         System.out.println("Done!");
         System.out.println("Locations processed: " + locations.size());
         System.out.println("Roads processed: width: " + roads.size() + " height:" + roads.get(0).size());
+
+        // Execute Clarke-Wright Algorithm
+        ClarkeWrightAlgorithm algorithm = new ClarkeWrightAlgorithm(locations, roads, trucks);
+        algorithm.execute();
+
+        // Visualize the results
+        System.out.println("\nLaunching visualization window...");
+        TruckRouteVisualizer visualizer = new TruckRouteVisualizer(locations, algorithm.getRoutes());
+        visualizer.visualize();
 
     }
 
@@ -73,8 +80,8 @@ public class Main {
 
             int id = location.getInt("id");
             String name = location.getString("name");
-            double longitude = location.getDouble("longitude") * 10;
-            double latitude = location.getDouble("latitude") * 10;
+            double longitude = location.getDouble("longitude") * 100;
+            double latitude = location.getDouble("latitude") * 100;
             int demand = location.getInt("demand");
 
             if (name.equals("Depot")) {
