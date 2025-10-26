@@ -384,6 +384,119 @@ tickers = []
 weights = []
 sub_portfolio_percentage = 0.25
 
+with st.sidebar:
+        st.header("Portfolio Selection")
+        # CSV upload
+        uploaded_file = st.file_uploader("Upload CSV File (TICKER, WEIGHT)", type=["csv"])
+
+        if uploaded_file is not None:
+            try:
+                df = pd.read_csv(uploaded_file, header=None)
+                if df.shape[0] == 1:
+                    tickers = df.iloc[0].tolist()
+                elif df.shape[0] == 2:
+                    tickers = df.iloc[0].tolist()
+                    weights = df.iloc[1].apply(pd.to_numeric, errors='coerce')
+                    weights = weights.tolist()
+                    if np.sum(weights) != 1:
+                        st.warning("Weights do not sum to 1; normalizing weights.")
+                        weights = weights / np.sum(weights)
+                else:
+                    st.error("CSV must have one or two rows (Tickers and Weights).")
+            except:
+                st.error("Error parsing given CSV file.")
+                
+        # Set default tickers if none exist.
+        if not tickers:
+            tickers = ["AAPL","MSFT","GOOGL","AMZN","TSLA"]
+
+        ticker_input = st.text_input("Enter Tickers (Comma Separated)", value=','.join(tickers))
+        tickers = [ticker.strip() for ticker in ticker_input.split(',')]
+
+        start_date = st.date_input("Start Date", value=pd.to_datetime("2020-01-01"))
+        # Function to get the last business day
+        def get_last_business_day():
+            today = pd.to_datetime("today").normalize()  # Current date
+            # If today is a weekend (Saturday or Sunday), move to the previous Friday
+            if today.weekday() == 5:  # Saturday
+                last_business_day = today - pd.Timedelta(days=1)
+            elif today.weekday() == 6:  # Sunday
+                last_business_day = today - pd.Timedelta(days=2)
+            else:  # Weekdays
+                last_business_day = today
+            return last_business_day
+
+        # Set the end date to the last business day
+        end_date = st.date_input("End Date", value=get_last_business_day())
+
+        # Find the current risk free rate
+        def get_risk_free_rate():
+            ticker = "^TNX"  # Symbol for 10 year US Treasury Bill yield
+            data = yf.Ticker(ticker)
+            # Get the most recent closing value of the yield
+            rate = data.history(period="1d")
+            # If there is an error getting the Risk free rate, give 0.0
+            if(len(rate) == 0):
+                return 0.0
+            rate = rate['Close'].iloc[-1] / 100  # Convert to decimal (e.g., 4.5% -> 0.045)
+            return rate
+
+        # Set the selected comparison market index
+        selected_market = st.selectbox("Select Market Index to Compare", list(market_options.keys()))
+
+        # Get the current risk-free rate
+        risk_free_rate = get_risk_free_rate()
+        st.text(f'The current risk-free rate for a  10-year US Treasury Bill yield of {risk_free_rate:.4f}%')
+        risk_free_rate = st.number_input("Set Risk-Free Rate (Annual)", min_value=0.0, max_value=1.0, value=risk_free_rate, step=0.0001, format="%.4f", help="Risk-free rate for calculating Sharpe ratio.")
+
+        input_method = st.radio("Choose Input Method for Portfolio Weights", ('Slider', 'Number Input'))
+        st.subheader("Input Portfolio Weights")
+
+        if len(weights) <= 0:
+            weights = [1 / len(tickers)] * len(tickers)
+
+        elif len(weights) < len(tickers):  # If the ticker-weight matrix is not square
+            st.warning("A new ticker has been added, please review wights as they may have been adjusted.")
+            # Extend the weights array by adding 0 for the new tickers
+            weights = np.concatenate([weights, np.zeros(len(tickers) - len(weights))])
+
+        for i, ticker in enumerate(tickers):
+            name = yf.Ticker(ticker).get_info()['shortName']
+            if input_method == 'Slider':
+                weight = st.slider(f"Weight for {ticker} ({name}):", min_value=0.0, max_value=1.0, value=weights[i], format="%0.4f", step=0.0001)
+                weights[i] = weight
+            else:
+                weight = st.number_input(f"Weight for {ticker} ({name}):", min_value=0.0, max_value=1.0, value=weights[i], format="%0.4f", step=0.0001)
+                weights[i] = weight
+
+        weights = np.array(weights)
+        if np.sum(weights) != 1:
+            st.warning("Weights do not sum to 1; normalizing weights.")
+            weights = weights / np.sum(weights)
+
+        sub_portfolio_percentage = st.number_input("Set Sub-portfolio Weighting", min_value=0.0, max_value=1.0, value=sub_portfolio_percentage, step=0.0001, format="%.4f", help="Sub-portfolio weighting.")
+
+        # Check if tickers or weights are empty
+        if len(tickers) <= 0:
+            st.warning("No tickers or weights provided. Please input tickers and weights.")
+        else:
+            # Create a DataFrame with two rows: one for tickers and one for weights
+            df = pd.DataFrame([tickers, weights])
+
+            # Convert DataFrame to CSV
+            csv = df.to_csv(index=False, header=False)
+
+            # Convert the CSV string into a BytesIO object
+            csv_file = io.StringIO(csv)
+
+            # Add download button for CSV file
+            st.download_button(
+                label="Download Portfolio CSV",
+                data=csv_file.getvalue(),
+                file_name="portfolio.csv",
+                mime="text/csv"
+            )
+
 num_portfolios=5000
 num_portfolios_input_method = st.radio("Select Number of Portfolios for Efficient Frontier", ('Slider', 'Number Input'))
 if num_portfolios_input_method=='Slider': 
