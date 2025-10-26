@@ -69,8 +69,13 @@ class GridGame:
         self.place_ships()
         
         # Gemini Setup
-        genai.configure(api_key=os.getenv("AIzaSyAMzBhB_EGkzfO-d5dIVKZ7Sw-_2X0vE1QY"))
-        self.model = genai.GenerativeModel('gemini-pro')
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+        for model in genai.list_models():
+            if 'generateContent' in model.supported_generation_methods:
+                print(f"Model Name: {model.name}, Display Name: {model.display_name}")
+
+        self.model = genai.GenerativeModel('gemini-2.5-pro')
         
         print("🚢 BATTLESHIP STARTED! AI is powered by Google Gemini")
         print(f"Player ships placed at: {[ship.positions for ship in self.player_ships]}")
