@@ -3,7 +3,6 @@ package helperobjects;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;

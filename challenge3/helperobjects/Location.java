@@ -2,8 +2,6 @@ package helperobjects;
 
 import merrimackutil.util.Tuple;
 
-import java.util.HashMap;
-
 /**
  * class representing a location (or a node in a graph)
  */
