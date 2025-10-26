@@ -1,3 +1,5 @@
+package helperobjects;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -5,11 +7,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
-import helperobjects.ClarkeWrightAlgorithm;
-import helperobjects.Location;
-import helperobjects.Truck;
-import helperobjects.TruckRouteVisualizer;
 import merrimackutil.json.JsonIO;
 import merrimackutil.json.types.JSONArray;
 import merrimackutil.json.types.JSONObject;
@@ -254,7 +251,7 @@ public class VehicleRoutingGUI extends JFrame {
             java.util.Arrays.asList(finalRoutes);
         
         // Launch the visualization
-        TruckRouteVisualizer.visualize(locations, routesList);
+        TruckRouteVisualizerNative.visualize(locations, routesList);
     }
     
     private void clearOutput() {

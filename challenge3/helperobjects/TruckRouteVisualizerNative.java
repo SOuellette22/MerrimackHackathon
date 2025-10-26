@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Native Java Swing/AWT visualization of truck routes
  */
-public class TruckRouteVisualizer extends JPanel {
+public class TruckRouteVisualizerNative extends JPanel {
     
     private HashMap<Integer, Location> locations;
     private List<ClarkeWrightAlgorithm.Route> routes;
@@ -19,8 +19,8 @@ public class TruckRouteVisualizer extends JPanel {
         Color.ORANGE, Color.CYAN, Color.PINK, Color.YELLOW
     };
     
-    public TruckRouteVisualizer(HashMap<Integer, Location> locations,
-                                List<ClarkeWrightAlgorithm.Route> routes) {
+    public TruckRouteVisualizerNative(HashMap<Integer, Location> locations, 
+                                      List<ClarkeWrightAlgorithm.Route> routes) {
         this.locations = locations;
         this.routes = routes;
         calculateBounds();
@@ -350,7 +350,7 @@ public class TruckRouteVisualizer extends JPanel {
             JFrame frame = new JFrame("Vehicle Routing Visualization");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             
-            TruckRouteVisualizer panel = new TruckRouteVisualizer(locations, routes);
+            TruckRouteVisualizerNative panel = new TruckRouteVisualizerNative(locations, routes);
             frame.add(panel);
             
             frame.pack();
