@@ -69,7 +69,7 @@ class GridGame:
         self.place_ships()
         
         # Gemini Setup
-        genai.configure(api_key=os.getenv("AIzaSyAMzBhB_EGkzfO-d5dIVKZ7Sw-_2X0vE1QY"))
+        genai.configure(api_key=os.getenv("..."))
         self.model = genai.GenerativeModel('gemini-pro')
         
         print("🚢 BATTLESHIP STARTED! AI is powered by Google Gemini")
