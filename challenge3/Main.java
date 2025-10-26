@@ -21,18 +21,13 @@ public class Main {
     public static void main(String[] args) throws InvalidJSONException, FileNotFoundException, InvalidObjectException {
         locations = new HashMap<>();
 
-        deserialize(JsonIO.readObject(new File("challenge3/truck_routedataset.json")));
-
-        System.out.println("Done!");
-        System.out.println("Locations processed: " + locations.size());
-        System.out.println("Roads processed: width: " + roads.size() + " height:" + roads.get(0).size());
+        deserialize(JsonIO.readObject(new File("challenge3/testing/test5.json")));
 
         // Execute Clarke-Wright Algorithm
         ClarkeWrightAlgorithm algorithm = new ClarkeWrightAlgorithm(locations, roads, trucks);
         algorithm.execute();
 
         // Visualize the results
-        System.out.println("\nLaunching visualization window...");
         TruckRouteVisualizer visualizer = new TruckRouteVisualizer(locations, algorithm.getRoutes());
         visualizer.visualize();
 
@@ -108,7 +103,6 @@ public class Main {
             if (!roads.containsKey(fromId)) {
                 roads.put(fromId, new HashMap<>());
                 roads.get(fromId).put(toId, (double) timeTraveled);
-                System.out.println("Added road from " + fromId + " to " + toId + " with time " + timeTraveled);
             } else {
                 roads.get(fromId).put(toId, (double) timeTraveled);
             }
