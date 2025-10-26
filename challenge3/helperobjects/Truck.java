@@ -35,7 +35,7 @@ public class Truck {
         load -= nextLoc.getDemand();
         this.visitedLocations.add(nextLoc);
         nextLoc.visit();
-        this.minutesTravelled += this.currentLocation.getMinutes(nextLoc);
+        //this.minutesTravelled += this.currentLocation.getMinutes(nextLoc);
         this.currentLocation = nextLoc;
     }
 

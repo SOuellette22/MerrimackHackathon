@@ -1,6 +1,4 @@
-import helperobjects.Location;
-import helperobjects.Truck;
-import helperobjects.Turtle;
+package helperobjects;
 import merrimackutil.json.InvalidJSONException;
 import merrimackutil.json.JsonIO;
 import merrimackutil.json.types.JSONArray;
@@ -23,12 +21,21 @@ public class Main {
     public static void main(String[] args) throws InvalidJSONException, FileNotFoundException, InvalidObjectException {
         locations = new HashMap<>();
 
-        deserialize(JsonIO.readObject(new File("challenge3/truck_routedataset.json")));
+        // You can switch between the simplified and full dataset here
+        deserialize(JsonIO.readObject(new File("challenge3/truck_routedataset_simplified.json")));
+        // or use: deserialize(JsonIO.readObject(new File("challenge3/truck_routedataset.json")));
 
         System.out.println("Done!");
         System.out.println("Locations processed: " + locations.size());
         System.out.println("Roads processed: width: " + roads.size() + " height:" + roads.get(0).size());
 
+        // Execute Clarke-Wright Algorithm
+        ClarkeWrightAlgorithm algorithm = new ClarkeWrightAlgorithm(locations, roads, trucks);
+        algorithm.execute();
+        
+        // Visualize the results using native Java graphics
+        System.out.println("\nLaunching visualization window...");
+        TruckRouteVisualizerNative.visualize(locations, algorithm.getRoutes());
     }
 
     public static void deserialize(JSONType type) throws InvalidObjectException {
@@ -38,10 +45,7 @@ public class Main {
 
         JSONObject object = (JSONObject) type;
 
-        String[] keys = {"meta", "locations", "roads", "blocked"};
-        object.checkValidity(keys);
-
-
+        // Handle both simplified and full dataset formats
         processLocations(object.getArray("locations"));
         processRoads(object.getArray("roads"));
         processMeta(object.getObject("meta"));
@@ -60,7 +64,6 @@ public class Main {
         for (int i = 0; i < numTrucks; i++) {
             trucks.add(new Truck(i, truckCapacity, depot));
         }
-
     }
 
     public static void processLocations(JSONArray l) throws InvalidObjectException {
